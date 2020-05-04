@@ -9,6 +9,8 @@ v = {editable = true,version = "*"}
 
 [packages]
 kafka-python = "*"
+protobuf = "*"
+requests = "*"
 
 [requires]
 python_version = "3.8"

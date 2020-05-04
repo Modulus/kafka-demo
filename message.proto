@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+package demo;
+
+message Message {
+  string content = 1;
+  string timeStamp = 2;
+
+}
+
+// message AddressBook {
+//   repeated Person people = 1;
+// }
