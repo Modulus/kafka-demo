@@ -33,3 +33,21 @@ kubectl kudo install kafka \
 kubectl apply -f deployment.yaml
 
 kubectl logs -f -l
+
+# kind
+kind create cluster --config kind.yaml
+
+
+## TODO
+1. Set consumer to replay from beginning
+2. test kafka upgrade
+        KUDO Kafka 	Apache Kafka 	Minimum KUDO Version
+        1.0.0 	    2.3.0 	        0.8.0
+        1.0.1 	    2.3.1 	        0.8.0
+        1.0.2 	    2.3.1 	        0.8.0
+        1.1.0 	    2.4.0 	        0.9.0
+        1.2.0 	    2.4.0 	        0.10.0
+        1.2.1 	    2.4.1 	        0.11.0
+        1.3.0 	    2.5.0 	        0.11.0
+3. test kafka rollback
+4. test upgrade failure
