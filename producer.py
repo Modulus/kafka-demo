@@ -2,54 +2,61 @@ import time
 import datetime
 import json
 import base64
-from kafka import KafkaProducer
-from util import stamp_message, get_timestamp
+import os
+from kafka import KafkaProducer, errors
+from util import stamp_message, get_timestamp, get_logger, extract_bootstrap_servers
 
 import requests
 
 from generated.message_pb2 import Message
 
 import logging
-# ERROR_FORMAT = "%(levelname)s at %(asctime)s in %(funcName)s in %(filename) at line %(lineno)d: %(message)s"
-FORMAT = "%(lineno)d in %(filename)s at %(asctime)s: %(message)s"
-
-logging.basicConfig(format=FORMAT)
-logger = logging.getLogger("Producer")
-logger.setLevel(logging.DEBUG)
 
 
-def fetch_lorem():
-    url = "http://loremricksum.com/api/?paragraphs=1&quotes=1"
-    logger.info(f"Fetching lorem ipsum from: {url}")
+class MessageProducer(object):
+    def __init__(self):
+        self.servers = extract_bootstrap_servers()
+        self.logger = get_logger("MessageProducer")
+        self.logger.info(f"Found servers: {self.servers}")
 
-    message = Message()
+    def produce_messages(self):
+        kafka_producer = KafkaProducer(bootstrap_servers=self.servers)
+        while True:
+            message = self._fetch_lorem()
+            try:
+                self.logger.info(f"Sending: [{message}]")
+                kafka_producer.send("topic01", message.SerializeToString())
+                kafka_producer.flush()
+                time.sleep(4)
+            except errors.NoBrokersAvailable:
+                self.logger.error("Failed to find any brokers!")
 
-    response = requests.get(url)
+    def _fetch_lorem(self):
+        url = "http://loremricksum.com/api/?paragraphs=1&quotes=1"
+
+        self.logger.info(f"Fetching lorem ipsum from: {url}")
+
+        message = Message()
+
+        response = requests.get(url)
+
+        if response.status_code >= 200:
+            self.logger.debug("Response ok, mapping data")
+            self.logger.debug(f"Got: {response.text}")
+
+            data = json.loads(response.text)
+            self.logger.debug(f"Response: {data}")
+
+            message.content = data["data"][0]
+            message.timeStamp = get_timestamp()
+
+            self.logger.debug(f"Returning: '{message}")
+            return message
+
+        else:
+            self.logger.error("Failed to get data, returning None!")
+            return None
 
 
-    if response.status_code >= 200:
-        logger.info("Response ok, mappaing data")
-        logger.info(f"Got: {response.text}")
-
-        data = json.loads(response.text)
-        logger.info(f"Response: {data}")
-
-        message.content = data["data"][0]
-        message.timeStamp = get_timestamp()
-
-
-        logger.info(f"Returning: '{message}")
-        return message
-         
-
-    else:
-        logger.error("Failed to get data, returning None!")
-        return None
-
-
-producer = KafkaProducer(bootstrap_servers="127.0.0.1:9092")
-while True:
-    message = fetch_lorem()
-    producer.send("topic01", message.SerializeToString())
-    producer.flush()
-    time.sleep(4)
+producer = MessageProducer()
+producer.produce_messages()

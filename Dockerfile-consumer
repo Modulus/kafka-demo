@@ -1,5 +1,6 @@
 FROM python:3.8
 
+COPY generated/ ./generated/
 COPY consumer.py .
 COPY util.py .
 COPY Pipfile .
@@ -7,4 +8,4 @@ COPY Pipfile.lock .
 
 RUN pip install pipenv && pipenv install
 
-RUN pipenv run python consumer.py
+CMD pipenv run python consumer.py

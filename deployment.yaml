@@ -1,0 +1,52 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: producer
+spec:
+  selector:
+    matchLabels:
+      app: producer
+  template:
+    metadata:
+      labels:
+        app: producer
+    spec:
+      containers:
+      - name: producer
+        image: coderpews/kafka-demo-producer:latest
+        resources:
+          limits:
+            memory: "128Mi"
+            cpu: "500m"
+        env:
+          - name: BOOTSTRAP_SERVERS
+            value: "kafka-instance-kafka-0.kafka-instance-svc.default.svc.cluster.local:9092,kafka-instance-kafka-1.kafka-instance-svc.default.svc.cluster.local:9092,kafka-instance-kafka-2.kafka-instance-svc.default.svc.cluster.local:9092"            
+           
+        # ports:
+        # - containerPort: <Port>
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: consumer
+spec:
+  selector:
+    matchLabels:
+      app: consumer
+  template:
+    metadata:
+      labels:
+        app: consumer
+    spec:
+      containers:
+      - name: consumer
+        image: coderpews/kafka-demo-consumer:latest
+        resources:
+          limits:
+            memory: "128Mi"
+            cpu: "500m"
+        env:
+          - name: BOOTSTRAP_SERVERS
+            value: "kafka-instance-kafka-0.kafka-instance-svc.default.svc.cluster.local:9092,kafka-instance-kafka-1.kafka-instance-svc.default.svc.cluster.local:9092,kafka-instance-kafka-2.kafka-instance-svc.default.svc.cluster.local:9092"            
+        # ports:
+        # - containerPort: <Port>
