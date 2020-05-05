@@ -39,6 +39,8 @@ kind create cluster --config kind.yaml
 
 
 ## TODO
+kubectl kudo install kafka --instance=kafka-instance --namespace=default -p METRICS_ENABLED=true -p DEFAULT_REPLICATION_FACTOR=3 -p BROKER_COUNT=3 p BROKER_CPUS=512m BROKER_MEM=512m  --operator-version 1.0.2
+
 1. Set consumer to replay from beginning
 2. test kafka upgrade
         KUDO Kafka 	Apache Kafka 	Minimum KUDO Version

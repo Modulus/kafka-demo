@@ -1,0 +1,98 @@
+resources:
+  limits:
+    cpu: 512m
+    memory: 512Mi
+  requests:
+    cpu: 100m
+    memory: 128Mi
+# admin:
+#   existingSecret: "grafana-admin"
+#   userKey: "admin-user"
+#   passwordKey: "admin-password"
+persistence:
+  enabled: false
+  # initChownData: true
+  accessModes:
+    - ReadWriteOnce
+  size: 10Gi
+ingress:
+  enabled: false
+  annotations: 
+    kubernetes.io/ingress.class: nginx
+  labels: 
+    app: grafana
+    owner: interaktiv
+    comment: Jauda
+  path: /
+  # hosts:
+  #   - grafana.aws35.tv2.no
+  # tls: 
+  #   - hosts:
+  #     - grafana.aws35.tv2.no
+# extraConfigMapMounts:
+#   - name: leeroy-eks
+#     mountPath: /var/lib/grafana/dashboards/default
+#     subPath: leeroy-eks.json
+#     configMap: leeroy-eks
+#     readOnly: true
+dashboardProviders:
+  dashboardproviders.yaml:
+    apiVersion: 1
+    providers:
+    - name: 'custom'
+      orgId: 1
+      folder: ''
+      type: file
+      disableDeletion: false
+      editable: true
+      options:
+        path: /var/lib/grafana/dashboards/custom
+# dashboards:
+#   custom:
+#     kafka:
+#       file: dashboard.json
+      # datasource: kafka-prometheus
+    # prometheus-stats:
+    #   gnetId: 2
+    #   revision: 2
+    #   datasource: kafka-prometheus
+# notifiers:  {}
+  # notifiers.yaml:
+  #   notifiers:
+  #   - name: slack-notifier
+  #     type: slack
+  #     uid: slack1
+  #     org_id: 1
+  #     is_default: true
+  #     send_reminder: true
+  #     frequency: 1h
+  #     disable_resolve_message: false
+  #     settings:           
+  #       recipient: "{{ .Environment.Values.SLACK_CHANNEL }}" 
+  #       token: "{{ .Environment.Values.SLACK_TOKEN }}" 
+  #       uploadImage: true
+  #       url: "{{ .Environment.Values.SLACK_URL }}" prometheus-server 
+datasources: 
+  datasources.yaml:
+    apiVersion: 1
+    datasources:
+    - name: kafka-prometheus
+      type: prometheus
+      url: http://prometheus-server:80
+      access: proxy
+      isDefault: true
+
+
+    # - name: Prometheus-Leeroy
+    #   type: prometheus
+    #   url: http://prometheus.aws-dev-int.tv2.no:80
+    #   access: proxy
+    #   isDefault: true
+    # - name: loki
+    #   type: loki
+    #   url: http://loki:3100     
+    #   access: proxy    
+    # - name: loki-leeroy-prod
+    #   type: loki
+    #   access: proxy
+    #   url: http://loki-leeroy.aws-dev-int.tv2.no:3100
