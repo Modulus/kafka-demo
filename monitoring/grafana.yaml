@@ -5,10 +5,10 @@ resources:
   requests:
     cpu: 100m
     memory: 128Mi
-# admin:
-#   existingSecret: "grafana-admin"
-#   userKey: "admin-user"
-#   passwordKey: "admin-password"
+admin:
+  existingSecret: "grafana"
+  userKey: "admin-user"
+  passwordKey: "admin-password"
 persistence:
   enabled: false
   # initChownData: true
